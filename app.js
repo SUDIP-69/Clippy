@@ -1,16 +1,16 @@
 const defaultClips = [
-  { id: 1, type: 'text', content: 'Design is not just what it looks like and feels like. Design is how it works.', time: '2 min ago', device: 'MacBook Pro', pinned: true, tag: 'Quote' },
-  { id: 2, type: 'image', content: 'inspiration-board.jpg', time: '18 min ago', device: 'iPhone 15 Pro', pinned: false, tag: 'Inspiration', image: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=700&q=80' },
-  { id: 3, type: 'text', content: 'npm install lucide-react && npm run dev', time: '42 min ago', device: 'MacBook Pro', pinned: true, tag: 'Dev' },
-  { id: 4, type: 'file', content: 'project-brief-v3.pdf', time: '1 hr ago', device: 'MacBook Pro', pinned: false, tag: 'PDF', size: '2.4 MB' },
-  { id: 5, type: 'text', content: 'The best ideas start as tiny, almost invisible sparks.', time: '2 hrs ago', device: 'iPhone 15 Pro', pinned: false, tag: 'Note' },
-  { id: 6, type: 'text', content: 'https://linear.app/acme/team/active', time: '3 hrs ago', device: 'Pixel 8', pinned: false, tag: 'Link' },
-  { id: 7, type: 'image', content: 'moodboard.png', time: 'Yesterday', device: 'MacBook Pro', pinned: true, tag: 'Inspiration', image: 'https://images.unsplash.com/photo-1523726491678-bf852e717f6a?auto=format&fit=crop&w=700&q=80' },
-  { id: 8, type: 'file', content: 'team-offsite.png', time: 'Yesterday', device: 'iPhone 15 Pro', pinned: false, tag: 'Image', size: '840 KB' },
-  { id: 9, type: 'text', content: 'Remember to send the final handoff before Friday.', time: 'Yesterday', device: 'MacBook Pro', pinned: false, tag: 'Note' },
-  { id: 10, type: 'text', content: 'Color is a power which directly influences the soul.', time: '2 days ago', device: 'Pixel 8', pinned: false, tag: 'Quote' },
-  { id: 11, type: 'text', content: 'Meeting notes: keep the experience fast, quiet, and kind.', time: '2 days ago', device: 'MacBook Pro', pinned: false, tag: 'Note' },
-  { id: 12, type: 'text', content: 'A small detail can carry the whole feeling.', time: '3 days ago', device: 'iPhone 15 Pro', pinned: false, tag: 'Quote' }
+  { id: 1, type: 'text', content: 'Design is not just what it looks like and feels like. Design is how it works.', time: '2 min ago', device: 'This browser', pinned: true, tag: 'Quote' },
+  { id: 2, type: 'image', content: 'inspiration-board.jpg', time: '18 min ago', device: 'This browser', pinned: false, tag: 'Inspiration', image: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=700&q=80' },
+  { id: 3, type: 'text', content: 'npm install lucide-react && npm run dev', time: '42 min ago', device: 'This browser', pinned: true, tag: 'Dev' },
+  { id: 4, type: 'file', content: 'project-brief-v3.pdf', time: '1 hr ago', device: 'This browser', pinned: false, tag: 'PDF', size: '2.4 MB' },
+  { id: 5, type: 'text', content: 'The best ideas start as tiny, almost invisible sparks.', time: '2 hrs ago', device: 'This browser', pinned: false, tag: 'Note' },
+  { id: 6, type: 'text', content: 'https://linear.app/acme/team/active', time: '3 hrs ago', device: 'This browser', pinned: false, tag: 'Link' },
+  { id: 7, type: 'image', content: 'moodboard.png', time: 'Yesterday', device: 'This browser', pinned: true, tag: 'Inspiration', image: 'https://images.unsplash.com/photo-1523726491678-bf852e717f6a?auto=format&fit=crop&w=700&q=80' },
+  { id: 8, type: 'file', content: 'team-offsite.png', time: 'Yesterday', device: 'This browser', pinned: false, tag: 'Image', size: '840 KB' },
+  { id: 9, type: 'text', content: 'Remember to send the final handoff before Friday.', time: 'Yesterday', device: 'This browser', pinned: false, tag: 'Note' },
+  { id: 10, type: 'text', content: 'Color is a power which directly influences the soul.', time: '2 days ago', device: 'This browser', pinned: false, tag: 'Quote' },
+  { id: 11, type: 'text', content: 'Meeting notes: keep the experience fast, quiet, and kind.', time: '2 days ago', device: 'This browser', pinned: false, tag: 'Note' },
+  { id: 12, type: 'text', content: 'A small detail can carry the whole feeling.', time: '3 days ago', device: 'This browser', pinned: false, tag: 'Quote' }
 ];
 const STORAGE_KEY = 'clippy-clips';
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
@@ -27,10 +27,13 @@ const searchInput = document.getElementById('search-input');
 function loadClips() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    return Array.isArray(saved) ? saved.filter(clip => clip && clip.id && clip.type && typeof clip.content === 'string') : defaultClips;
+    return Array.isArray(saved) ? saved.filter(isValidClip).map(clip => ({ ...clip, device: 'This browser' })) : defaultClips;
   } catch {
     return defaultClips;
   }
+}
+function isValidClip(clip) {
+  return Boolean(clip && clip.id && ['text', 'image', 'file'].includes(clip.type) && typeof clip.content === 'string' && clip.content.length <= 100000);
 }
 function save() {
   try {
@@ -56,9 +59,12 @@ function render() {
   visible = [...visible].sort((a, b) => sortNewest ? b.id - a.id : a.id - b.id);
   grid.innerHTML = visible.map(cardMarkup).join('');
   emptyState.hidden = visible.length > 0;
+  const counts = { all: clips.length, text: 0, image: 0, file: 0 };
+  clips.forEach(clip => { if (counts[clip.type] !== undefined) counts[clip.type] += 1; });
   document.getElementById('clip-total').textContent = clips.length;
-  document.getElementById('all-count').textContent = clips.length;
+  document.getElementById('all-count').textContent = counts.all;
   document.getElementById('pinned-count').textContent = clips.filter(clip => clip.pinned).length;
+  document.querySelectorAll('.filter-button').forEach(button => { button.querySelector('span').textContent = counts[button.dataset.filter]; });
   document.querySelectorAll('.filter-button').forEach(button => button.classList.toggle('active', button.dataset.filter === activeFilter));
   grid.querySelectorAll('.copy-button').forEach(button => button.addEventListener('click', copyClip));
   grid.querySelectorAll('.pin-button').forEach(button => button.addEventListener('click', togglePin));
@@ -67,14 +73,14 @@ function render() {
 }
 async function copyClip(event) { const clip = clips.find(item => String(item.id) === event.target.closest('.clip-card').dataset.id); if (!clip) return; try { await navigator.clipboard.writeText(clip.content); } catch { const area = document.createElement('textarea'); area.value = clip.content; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0'; document.body.append(area); area.select(); const copied = document.execCommand('copy'); area.remove(); if (!copied) { showToast('Clipboard access was blocked'); return; } } showToast(`${typeLabel(clip.type)} copied to clipboard`); }
 function togglePin(event) { const card = event.target.closest('.clip-card'); const clip = clips.find(item => String(item.id) === card.dataset.id); if (!clip) return; clip.pinned = !clip.pinned; save(); render(); showToast(clip.pinned ? 'Pinned to your library' : 'Removed from pinned'); }
-function deleteClip(event) { const card = event.target.closest('.clip-card'); const removed = clips.find(item => String(item.id) === card.dataset.id); clips = clips.filter(item => String(item.id) !== card.dataset.id); save(); render(); showToast(`${typeLabel(removed.type)} removed`); }
-async function downloadClip(event) { const card = event.target.closest('.clip-card'); const clip = clips.find(item => String(item.id) === card.dataset.id); if (!clip) return; const source = clip.data || clip.image; if (!source) { showToast('This attachment has no downloadable data'); return; } try { const response = await fetch(source); const blob = await response.blob(); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = clip.content; link.click(); URL.revokeObjectURL(link.href); } catch { const link = document.createElement('a'); link.href = source; link.download = clip.content; link.target = '_blank'; link.click(); } showToast(`${typeLabel(clip.type)} download started`); }
+function deleteClip(event) { const card = event.target.closest('.clip-card'); const removed = clips.find(item => String(item.id) === card.dataset.id); if (!removed) return; clips = clips.filter(item => String(item.id) !== card.dataset.id); save(); render(); showToast(`${typeLabel(removed.type)} removed`); }
+async function downloadClip(event) { const card = event.target.closest('.clip-card'); const clip = clips.find(item => String(item.id) === card.dataset.id); if (!clip) return; const source = clip.data || clip.image; if (!source) { showToast('This attachment has no downloadable data'); return; } try { const response = await fetch(source); if (!response.ok) throw new Error('Download failed'); const blob = await response.blob(); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = clip.content; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); } catch { const link = document.createElement('a'); link.href = source; link.download = clip.content; link.target = '_blank'; link.rel = 'noopener'; link.click(); } showToast(`${typeLabel(clip.type)} download started`); }
 function resetDialog() { document.getElementById('clip-content').value = ''; document.getElementById('clip-file').value = ''; selectedType = 'text'; document.querySelectorAll('.type-tab').forEach(item => item.classList.toggle('active', item.dataset.type === 'text')); document.getElementById('text-entry').hidden = false; document.getElementById('file-entry').hidden = true; }
 function openDialog() { resetDialog(); dialog.showModal(); }
 function updateViewLabel(label) { document.getElementById('current-view').textContent = label; document.querySelector('.page-heading h1').firstChild.textContent = `${label} `; }
 function readFile(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(reader.error); reader.readAsDataURL(file); }); }
 function downloadBackup() { const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), clips }, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `clippy-backup-${new Date().toISOString().slice(0, 10)}.json`; link.click(); URL.revokeObjectURL(link.href); showToast('Backup exported'); }
-async function importBackup(event) { const file = event.target.files[0]; event.target.value = ''; if (!file) return; try { const imported = JSON.parse(await file.text()); const incoming = Array.isArray(imported) ? imported : imported.clips; if (!Array.isArray(incoming) || incoming.some(clip => !clip || !clip.id || !['text', 'image', 'file'].includes(clip.type) || typeof clip.content !== 'string')) throw new Error('Invalid backup'); clips = incoming; save(); render(); showToast(`${clips.length} clips restored`); } catch { showToast('That backup file is not valid'); } }
+async function importBackup(event) { const file = event.target.files[0]; event.target.value = ''; if (!file) return; try { const imported = JSON.parse(await file.text()); const incoming = Array.isArray(imported) ? imported : imported.clips; if (!Array.isArray(incoming) || incoming.some(clip => !isValidClip(clip))) throw new Error('Invalid backup'); const previous = clips; clips = incoming; if (!save()) { clips = previous; return; } render(); showToast(`${clips.length} clips restored`); } catch { showToast('That backup file is not valid'); } }
 
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => { activeView = button.dataset.view; activeFilter = activeView === 'all' || activeView === 'pinned' ? 'all' : activeView; document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item === button)); updateViewLabel(activeView === 'all' ? 'All clips' : activeView === 'pinned' ? 'Pinned' : `${typeLabel(activeView)}s`); render(); }));
 document.querySelectorAll('.filter-button').forEach(button => button.addEventListener('click', () => { activeFilter = button.dataset.filter; activeView = 'all'; document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === activeFilter || (activeFilter === 'all' && item.dataset.view === 'all'))); updateViewLabel(activeFilter === 'all' ? 'All clips' : `${typeLabel(activeFilter)}s`); render(); }));

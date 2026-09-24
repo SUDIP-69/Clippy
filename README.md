@@ -2,6 +2,8 @@
 
 Clippy is a lightweight browser clipboard library for saving, searching, organizing, and reusing text, image, and file clips.
 
+This repository is a local MVP. It is ready to use as a private, single-browser clipboard, but it is not yet an online multi-device service.
+
 ## Current features
 
 - Save text clips or upload images and files up to 2 MB.
@@ -31,6 +33,6 @@ Clippy currently stores clips only in the current browser profile. There is no a
 
 Use **Export backup** before clearing browser data or moving to another browser. The exported JSON includes the saved clip content and attachment data.
 
-## Next phase: online sync
+## Before launching online
 
-The online version should add authentication, an API, encrypted HTTPS transport, server-side encrypted storage, object storage for attachments, per-user access controls, and conflict resolution for edits made on multiple devices.
+The online version needs authentication, an API, HTTPS, server-side encrypted storage, object storage for attachments, per-user access controls, rate limiting, validation, and conflict resolution. The current local-storage data model can serve as the client-side prototype, but the connected-device UI should not be enabled until those services exist.
