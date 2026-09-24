@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f2eb" />
+    <title>Clippy - Universal clipboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">C</span><span>clippy</span></div>
+        <div class="workspace-switcher"><span class="avatar avatar-coral">SC</span><span><b>Sudip's space</b><small>Personal workspace</small></span><span class="chevron">⌄</span></div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <p class="nav-label">Library</p>
+          <button class="nav-item active" data-view="all"><span class="nav-icon">▦</span>All clips <b class="nav-count" id="all-count">12</b></button>
+          <button class="nav-item" data-view="pinned"><span class="nav-icon">✦</span>Pinned <b class="nav-count" id="pinned-count">3</b></button>
+          <button class="nav-item" data-view="text"><span class="nav-icon">T</span>Text</button>
+          <button class="nav-item" data-view="image"><span class="nav-icon">▧</span>Images</button>
+          <button class="nav-item" data-view="file"><span class="nav-icon">↗</span>Files</button>
+          <p class="nav-label device-label">Connected devices</p>
+          <div class="device"><span class="device-dot"></span><span><b>MacBook Pro</b><small>Active now</small></span><span class="device-type">⌘</span></div>
+          <div class="device"><span class="device-dot device-dot-muted"></span><span><b>iPhone 15 Pro</b><small>Synced 2m ago</small></span><span class="device-type">⌁</span></div>
+          <div class="device"><span class="device-dot device-dot-muted"></span><span><b>Pixel 8</b><small>Synced yesterday</small></span><span class="device-type">▯</span></div>
+        </nav>
+        <div class="sidebar-bottom"><button class="side-link" id="export-clips"><span>↓</span>Export backup</button><button class="side-link" id="import-clips"><span>↑</span>Import backup</button><input id="import-file" type="file" accept="application/json" hidden /><div class="sync-card"><span class="sync-orbit">✓</span><div><b>Saved on this browser</b><small>Private local storage</small></div></div></div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar"><div class="breadcrumb"><span>Library</span><span>/</span><strong id="current-view">All clips</strong></div><div class="top-actions"><button class="icon-button" title="Search" id="focus-search">⌕</button><button class="icon-button" title="Notifications">♧<i></i></button><button class="profile-button"><span class="avatar avatar-plum">SC</span><span>Sudip</span><span class="chevron">⌄</span></button></div></header>
+        <section class="page-heading"><div><p class="eyebrow">YOUR SHARED MEMORY</p><h1>All clips <span id="clip-total">12</span></h1><p class="subtitle">Everything you copy, ready wherever you are.</p></div><button class="primary-button" id="new-clip"><span>＋</span> New clip</button></section>
+        <section class="toolbar"><div class="search-box"><span>⌕</span><input id="search-input" placeholder="Search your clips..." autocomplete="off" /><kbd>⌘ K</kbd></div><div class="filter-group" role="group" aria-label="Filter clips"><button class="filter-button active" data-filter="all">All <span>12</span></button><button class="filter-button" data-filter="text">Text <span>8</span></button><button class="filter-button" data-filter="image">Images <span>2</span></button><button class="filter-button" data-filter="file">Files <span>2</span></button></div><button class="sort-button" id="sort-button">Newest first <span>⌄</span></button></section>
+        <div class="sync-banner"><span class="live-pulse"></span><span><b>Local mode</b> Your clips are saved privately in this browser</span><button id="dismiss-banner" aria-label="Dismiss notice">×</button></div>
+        <section class="clip-grid" id="clip-grid" aria-live="polite"></section>
+        <div class="empty-state" id="empty-state" hidden><div class="empty-icon">⌕</div><h2>No clips found</h2><p>Try a different search or add a new clip.</p></div>
+      </main>
+    </div>
+    <dialog id="clip-dialog"><form method="dialog" id="clip-form"><div class="dialog-header"><div><p class="eyebrow">ADD TO YOUR LIBRARY</p><h2>New clip</h2></div><button type="button" class="close-button" id="close-dialog" aria-label="Close">×</button></div><label class="field-label">Content type</label><div class="type-tabs"><button type="button" class="type-tab active" data-type="text">T Text</button><button type="button" class="type-tab" data-type="image">▧ Image</button><button type="button" class="type-tab" data-type="file">↗ File</button></div><div id="text-entry"><label class="field-label" for="clip-content">What do you want to keep?</label><textarea id="clip-content" rows="5" maxlength="100000" placeholder="Paste or type something memorable..."></textarea><button type="button" class="sort-button" id="paste-clipboard">Paste from clipboard</button></div><div id="file-entry" hidden><label class="drop-zone" for="clip-file"><span class="drop-symbol">＋</span><b>Choose a file</b><small>Any file up to 2 MB</small><input id="clip-file" type="file" /></label></div><div class="dialog-footer"><span class="privacy-note">Saved only in this browser</span><button class="primary-button" value="default">Save clip <span>↗</span></button></div></form></dialog>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

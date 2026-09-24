@@ -1,55 +1,36 @@
 # Clippy
 
-A private clipboard you can run on your laptop or on the public internet. Create a room, open the same link on every device, then share text, images, and files.
+Clippy is a lightweight browser clipboard library for saving, searching, organizing, and reusing text, image, and file clips.
 
-The room code **is** the password. Anyone with the link can read and write that clipboard.
+## Current features
+
+- Save text clips or upload images and files up to 2 MB.
+- Search clips and filter by text, image, file, or pinned status.
+- Copy text clips back to the system clipboard.
+- Download saved images and files.
+- Pin and delete clips.
+- Sort clips newest-first or oldest-first.
+- Export and import a JSON backup.
+- Persist data in the browser's local storage.
 
 ## Run locally
 
-```powershell
-cd C:\Users\USER\Clippy
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-$env:DEV="1"
-python app.py
+Open `index.html` in a modern browser. No build step or dependency installation is required.
+
+For the most predictable clipboard permissions, serve the folder from a local web server instead of opening the file directly. For example, with Python installed:
+
+```text
+python -m http.server 8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
+Then visit `http://localhost:8000`.
 
-## Deploy publicly (Render)
+## Data and privacy
 
-1. Push this folder to a GitHub repo.
-2. In [Render](https://render.com), create a **Web Service** from that repo.
-3. Render will pick up `render.yaml`, or set:
-   - **Build:** `pip install -r requirements.txt`
-   - **Start:** `uvicorn app:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips=*`
-4. Environment variables:
-   - `DEV=0`
-   - `TRUST_PROXY=1`
-   - `DATA_DIR=/var/data`
-   - `ALLOWED_HOSTS=your-app.onrender.com`
-5. Add a **persistent disk** mounted at `/var/data` so clips survive restarts.
+Clippy currently stores clips only in the current browser profile. There is no account system, cloud database, or cross-device synchronization yet. Uploaded files and image data are stored locally as data URLs, so large libraries can run into browser storage limits.
 
-After it deploys, create a clipboard and use that HTTPS link on your phone (any network, not only home Wi‑Fi).
+Use **Export backup** before clearing browser data or moving to another browser. The exported JSON includes the saved clip content and attachment data.
 
-Docker works too: `docker build -t clippy .` then run with `-e TRUST_PROXY=1 -v clippy-data:/data -p 8000:8000`.
+## Next phase: online sync
 
-## Security model
-
-This is **not** a login app. Protection is:
-
-- 10-character unguessable room codes (~1e15 possibilities)
-- Rate limits on create / write / guess
-- Board code required on every read, write, download, and delete
-- Files stored under random names; downloads are attachments
-- Only real PNG/JPEG/GIF/WebP bytes are shown as images (HTML/SVG cannot execute)
-- `/docs` is disabled, security headers + CSP, no-store on clipboard pages
-
-Do not post a room link in public chats. Delete clips when you are done.
-
-## Limits
-
-- 25 MB per file
-- 100 clips per room
-- 8 new rooms per hour per IP
+The online version should add authentication, an API, encrypted HTTPS transport, server-side encrypted storage, object storage for attachments, per-user access controls, and conflict resolution for edits made on multiple devices.
